@@ -1,0 +1,72 @@
+package id3;
+
+public class Table {
+
+	protected Element[][] _matrix;
+	protected int _rows;
+	protected int _cols;
+	
+	public Table(int rows, int cols) {
+		_rows = rows;
+		_cols = cols;
+		
+		_matrix = new Element[rows][cols];
+	}
+	
+	public boolean isEmpty() {
+		return getRowLength() == 0 && getColumnsLength() == 0;
+	}
+
+	public int getRowLength() {
+		return _rows;
+	}
+	
+	public int getColumnsLength() {
+		return _cols;
+	}
+	
+	public Element getElement(int row, int col) {
+		if (_rows <= row || _cols <= col)
+			throw new IndexOutOfBoundsException();
+		
+		return _matrix[row][col];
+	}
+	
+	public void putElement(int row, int col, Element element) {
+		if (_rows <= row || _cols <= col)
+			throw new IndexOutOfBoundsException();
+		
+		_matrix[row][col] = element;
+	}
+	
+	public void addRow() {
+		Element[][] elements = _matrix;
+		_matrix = new Element[_rows++][_cols];
+		_matrix = elements;
+	}
+	
+	public void addColumn() throws Exception {
+		Element[][] elements = _matrix;
+		_matrix = new Element[_rows][_cols++];
+		_matrix = elements;
+	}
+	
+	public Element[] getRow(int row) {
+		if (_rows <= row)
+			throw new IndexOutOfBoundsException();
+		
+		return _matrix[row];
+	}
+	
+	public Element[] getColumn(int col) {
+		if (_cols <= col)
+			throw new IndexOutOfBoundsException();
+		Element[] out = new Element[_rows];
+		
+		for (int i = 0; i < _rows; i++) {
+			out[i] = _matrix[i][col];
+		}
+		
+		return out;
+	}
+}
