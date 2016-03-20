@@ -1,20 +1,16 @@
-package id3;
+package knn;
 
-public class Element {
+public abstract class Element {
 	
-	private boolean _categorical;
-	private String _value;
+	protected String _value;
 	
-	public Element(String value, boolean categorical) {
-		_categorical = categorical;
+	public Element(String value) {
 		_value = value;
-	}
-	
-	public boolean isCategorical() {
-		return _categorical;
 	}
 	
 	public String getValue() {
 		return _value;
 	}
+
+	public abstract double minus(Element element);
 }

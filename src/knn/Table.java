@@ -1,4 +1,4 @@
-package id3;
+package knn;
 
 public class Table {
 
@@ -39,15 +39,16 @@ public class Table {
 		_matrix[row][col] = element;
 	}
 	
+	public void putRow(int row, Element[] elements) {
+		if (_rows <= row)
+			throw new IndexOutOfBoundsException();
+		
+		_matrix[row] = elements;
+	}
+	
 	public void addRow() {
 		Element[][] elements = _matrix;
 		_matrix = new Element[_rows++][_cols];
-		_matrix = elements;
-	}
-	
-	public void addColumn() throws Exception {
-		Element[][] elements = _matrix;
-		_matrix = new Element[_rows][_cols++];
 		_matrix = elements;
 	}
 	
