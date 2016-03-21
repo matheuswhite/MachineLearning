@@ -70,4 +70,28 @@ public class Table {
 		
 		return out;
 	}
+
+	public Table getSubTable(int initRow, int finalRow) {
+		Table subtable = new Table(finalRow - initRow, _cols);
+		
+		for (int i = 0; i < finalRow - initRow; i++) {
+			subtable.putRow(i, getRow(initRow + i));
+		}
+		
+		return subtable;
+	}
+	
+	public static Table joinTables(Table...tables) {
+		int sumRows = 0;
+		
+		for (int i = 0; i < tables.length; i++) {
+			sumRows += tables[i].getRowLength();
+		}
+		
+		Table out = new Table(sumRows, tables[0].getColumnsLength());
+		
+		//fazer
+		
+		return out;
+	}
 }

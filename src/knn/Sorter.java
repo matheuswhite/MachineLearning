@@ -16,7 +16,7 @@ public class Sorter {
 	}
 	
 	public Element getClassOf(Element[] row) throws Exception {
-		if (row.length < _trainingTable.getColumnsLength() - 1)
+		if (row.length < _trainingTable.getColumnsLength())
 			throw new Exception("This row has minus columns that training table!");
 		
 		//Create and initialize variables
@@ -72,7 +72,7 @@ public class Sorter {
 	private double distance(Element[] row1, Element[] row2) {
 		double sum = 0;
 		
-		for (int i = 0; i < row1.length; i++) {
+		for (int i = 0; i < row1.length - 1; i++) {
 			double result = row1[i].minus(row2[i]);
 			sum += (result * result);
 		}
@@ -82,6 +82,10 @@ public class Sorter {
 
 	public Table getTrainingTable() {
 		return _trainingTable;
+	}
+	
+	public void changeTrainingTable(Table table) {
+		_trainingTable = table;
 	}
 	
 	public int getK() {
