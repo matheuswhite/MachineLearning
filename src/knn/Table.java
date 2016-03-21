@@ -90,7 +90,17 @@ public class Table {
 		
 		Table out = new Table(sumRows, tables[0].getColumnsLength());
 		
-		//fazer
+		int i = 0;
+		for (int k = 0; k < tables.length; k++) {
+			int j = 0;
+			
+			while (i < sumRows && j < tables[k].getRowLength()) {
+				out.putRow(i, tables[k].getRow(j));
+				
+				i++;
+				j++;
+			}
+		}
 		
 		return out;
 	}
