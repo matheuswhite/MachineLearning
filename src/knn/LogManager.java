@@ -10,9 +10,11 @@ public class LogManager {
 	private static LogManager _instance = null;
 	private FileWriter _file;
 	private List<String> _content;
+	private boolean _isOpen;
 	
 	private LogManager() {
 		_content = new LinkedList<String>();
+		_isOpen = false;
 	}
 	
 	public static synchronized LogManager Instance() {
@@ -23,11 +25,21 @@ public class LogManager {
 	}
 	
 	public void openLog(String filePath) throws IOException {
-		_file = new FileWriter(filePath, true);
+		if (_isOpen) {
+			closeLog();
+		}
+		_file = new FileWriter(filePath, false);
+		_isOpen = true;
 	}
 	
 	public void closeLog() throws IOException {
 		_file.close();
+		_isOpen = false;
+	}
+	
+	public void commitAndWrite(String line) throws IOException {
+		commit(line);
+		writeToLog();
 	}
 	
 	public void writeToLog() throws IOException {

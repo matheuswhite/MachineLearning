@@ -10,47 +10,27 @@ import java.util.List;
 
 public class Evaluator {
 
-	private List<Table> _subTablesTraining;
-	private List<Table> _subTablesTest;
+	private ArrayList<Table> _subTablesTraining;
+	private ArrayList<Table> _subTablesTest;
 	private Table _dataBase;
 	private Sorter _sorter;
 	private int[][] _statistics;
 
-	public void runEvaluation() {
-		initVariables();
-
-		_sorter = new Sorter(1, null);
+	public Evaluator(int logId) {
 		try {
-			LogManager.Instance().openLog("iris1.log");
-
-			for (int i = 0; i < _subTablesTraining.size(); i++) {
-				_sorter.changeTrainingTable(_subTablesTest.get(i));
-
-				for (int j = 0; j < _subTablesTest.get(i).getRowLength(); j++) {
-					Element[] row = _subTablesTest.get(i).getRow(j);
-					Element result = _subTablesTest.get(i).getElement(j, _subTablesTest.get(i).getColumnsLength() - 1);
-					try {
-						evaluate(_sorter.getClassOf(row), result, i, "Subset:" + i + " Case:" + j);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-
-				LogManager.Instance().writeToLog();
-			}
-
-			writeStatisticTable();
-
-			LogManager.Instance().closeLog();
-		} catch (IOException e1) {
+			System.out.println("Opening log file...");
+			LogManager.Instance().openLog("src/iris" + logId + ".log");
+		}
+		catch (IOException e1) {
 			e1.printStackTrace();
 		}
 	}
 	
-	private void loadDataBase() {
-
+	private void loadDataBase() throws IOException {
+		System.out.println("Loading data base...");
+		
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("iris.data"));
+			BufferedReader br = new BufferedReader(new FileReader("src/iris.data"));
 			String line = br.readLine();
 			_dataBase = new Table(1, 5);
 			int row = 0;
@@ -60,7 +40,7 @@ public class Evaluator {
 
 				for (int j = 0; j < 5; j++) {
 					String item = itens.get(j);
-					Element element = (j == 4) ? new CategoricalElement(item) : new NumericalElement(Integer.parseInt(item)) ;
+					Element element = (j == 4) ? new CategoricalElement(item) : new NumericalElement(item) ;
 					if (_dataBase.getRowLength() - 1 < row) {
 						_dataBase.addRow();
 					}
@@ -74,13 +54,17 @@ public class Evaluator {
 			br.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+			LogManager.Instance().commitAndWrite("File of data base not found\n");
 		} catch (IOException e) {
+			LogManager.Instance().commitAndWrite("IO error in line " + 59);
 			e.printStackTrace();
 		}
+		LogManager.Instance().commitAndWrite("Data base loaded successfully\n");
 	}
 	
-	private void initVariables() {
+	private void initVariables() throws IOException {
 		loadDataBase();
+		System.out.println("Initializing test and training subsets...");
 		
 		_statistics = new int[10][3];
 		_subTablesTraining = new ArrayList<Table>(10);
@@ -88,16 +72,18 @@ public class Evaluator {
 		int index = (int) (_dataBase.getRowLength() * 0.1);
 		
 		for (int i = 0; i < 10; i++) {
-			_subTablesTest.add(_dataBase.getSubTable(index * i, index * (i+1)));
+			_subTablesTest.add(_dataBase.getSubTable(index * i, (index * (i+1))));
 		}
 		
 		for (int i = 0; i < 10; i++) {
-			List<Table> tempList = _subTablesTest;
+			ArrayList<Table> tempList = new ArrayList<Table>(_subTablesTest);
 			tempList.remove(i);
-			_subTablesTraining.add(Table.joinTables((Table[]) tempList.toArray()));
+			_subTablesTraining.add(Table.joinTables(tempList));
 		}
+		
+		LogManager.Instance().commitAndWrite("Test and traning subsets initialized successfully\n");
 	}
-
+	
 	private void evaluate(Element answer, Element expected, int subSet, String message) {
 
 		if (answer.equals(expected)) {
@@ -122,5 +108,51 @@ public class Evaluator {
 		}
 		
 		LogManager.Instance().writeToLog();
+	}
+	
+	public void runEvaluation(int k) {
+		try {
+			initVariables();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
+		_sorter = new Sorter(k, null);
+
+		System.out.println("Testing...");
+		
+		for (int i = 0; i < _subTablesTraining.size(); i++) {
+			_sorter.changeTrainingTable(_subTablesTest.get(i));
+
+			for (int j = 0; j < _subTablesTest.get(i).getRowLength(); j++) {
+				ArrayList<Element> row = _subTablesTest.get(i).getRow(j);
+				Element result = _subTablesTest.get(i).getElement(j, _subTablesTest.get(i).getColumnsLength() - 1);
+				try {
+					evaluate(_sorter.getClassOf(row), result, i, "Subset:" + i + " Case:" + j);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+
+			try {
+				LogManager.Instance().writeToLog();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		try {
+			writeStatisticTable();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			LogManager.Instance().closeLog();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		System.out.println("Done\n");
 	}
 }

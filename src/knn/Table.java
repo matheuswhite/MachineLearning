@@ -1,8 +1,10 @@
 package knn;
 
+import java.util.ArrayList;
+
 public class Table {
 
-	protected Element[][] _matrix;
+	protected ArrayList<ArrayList<Element> > _matrix;
 	protected int _rows;
 	protected int _cols;
 	
@@ -10,7 +12,13 @@ public class Table {
 		_rows = rows;
 		_cols = cols;
 		
-		_matrix = new Element[rows][cols];
+		_matrix = new ArrayList<ArrayList<Element> >();
+		for (int i = 0; i < _rows; i++) {
+			_matrix.add(new ArrayList<Element>());
+			for (int j = 0; j < _cols; j++) {
+				_matrix.get(i).add(new NullElement());
+			}
+		}
 	}
 	
 	public boolean isEmpty() {
@@ -29,43 +37,48 @@ public class Table {
 		if (_rows <= row || _cols <= col)
 			throw new IndexOutOfBoundsException();
 		
-		return _matrix[row][col];
+		return _matrix.get(row).get(col);
 	}
 	
 	public void putElement(int row, int col, Element element) {
-		if (_rows <= row || _cols <= col)
-			throw new IndexOutOfBoundsException();
+		if (_rows <= row || _cols <= col) {
+			throw new IndexOutOfBoundsException("Put Element Exception");
+		}
 		
-		_matrix[row][col] = element;
+		_matrix.get(row).add(col, element);
 	}
 	
-	public void putRow(int row, Element[] elements) {
+	public void putRow(int row, ArrayList<Element> elements) {
 		if (_rows <= row)
 			throw new IndexOutOfBoundsException();
 		
-		_matrix[row] = elements;
+		_matrix.add(row, elements);
 	}
 	
 	public void addRow() {
-		Element[][] elements = _matrix;
-		_matrix = new Element[_rows++][_cols];
-		_matrix = elements;
+		_matrix.add(new ArrayList<Element>());
+		
+		for (int i = 0; i < _cols; i++) {
+			_matrix.get(_rows).add(new NullElement());
+		}
+		_rows++;
 	}
 	
-	public Element[] getRow(int row) {
+	public ArrayList<Element> getRow(int row) {
 		if (_rows <= row)
 			throw new IndexOutOfBoundsException();
 		
-		return _matrix[row];
+		return _matrix.get(row);
 	}
 	
-	public Element[] getColumn(int col) {
+	public ArrayList<Element> getColumn(int col) {
 		if (_cols <= col)
 			throw new IndexOutOfBoundsException();
-		Element[] out = new Element[_rows];
+		
+		ArrayList<Element> out = new ArrayList<Element>();
 		
 		for (int i = 0; i < _rows; i++) {
-			out[i] = _matrix[i][col];
+			out.add(_matrix.get(i).get(col));
 		}
 		
 		return out;
@@ -81,21 +94,21 @@ public class Table {
 		return subtable;
 	}
 	
-	public static Table joinTables(Table...tables) {
+	public static Table joinTables(ArrayList<Table> tables) {
 		int sumRows = 0;
 		
-		for (int i = 0; i < tables.length; i++) {
-			sumRows += tables[i].getRowLength();
+		for (int i = 0; i < tables.size(); i++) {
+			sumRows += tables.get(i).getRowLength();
 		}
 		
-		Table out = new Table(sumRows, tables[0].getColumnsLength());
+		Table out = new Table(sumRows, tables.get(0).getColumnsLength());
 		
 		int i = 0;
-		for (int k = 0; k < tables.length; k++) {
+		for (int k = 0; k < tables.size(); k++) {
 			int j = 0;
 			
-			while (i < sumRows && j < tables[k].getRowLength()) {
-				out.putRow(i, tables[k].getRow(j));
+			while (i < sumRows && j < tables.get(k).getRowLength()) {
+				out.putRow(i, tables.get(k).getRow(j));
 				
 				i++;
 				j++;

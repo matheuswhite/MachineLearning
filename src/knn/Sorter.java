@@ -15,8 +15,8 @@ public class Sorter {
 		_k = k;
 	}
 	
-	public Element getClassOf(Element[] row) throws Exception {
-		if (row.length < _trainingTable.getColumnsLength())
+	public Element getClassOf(ArrayList<Element> row) throws Exception {
+		if (row.size() < _trainingTable.getColumnsLength())
 			throw new Exception("This row has minus columns that training table!");
 		
 		//Create and initialize variables
@@ -69,11 +69,11 @@ public class Sorter {
 		return mostCommon;
 	}
 	
-	private double distance(Element[] row1, Element[] row2) {
+	private double distance(ArrayList<Element> row1, ArrayList<Element> row2) {
 		double sum = 0;
 		
-		for (int i = 0; i < row1.length - 1; i++) {
-			double result = row1[i].minus(row2[i]);
+		for (int i = 0; i < row1.size() - 1; i++) {
+			double result = row1.get(i).minus(row2.get(i));
 			sum += (result * result);
 		}
 		
